@@ -29,6 +29,10 @@ module Jasmine
       @driver.navigate.to @http_address
     end
 
+    def wait_for_body
+      @driver.first(:tag_name => 'body')
+    end
+
     def disconnect
       @driver.quit
     end

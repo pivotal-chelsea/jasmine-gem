@@ -30,6 +30,7 @@ module Jasmine
       start_jasmine_server
       @client = Jasmine::SeleniumDriver.new(browser, "#{jasmine_host}:#{@jasmine_server_port}/")
       @client.connect
+      @client.wait_for_body
     end
 
     def stop
