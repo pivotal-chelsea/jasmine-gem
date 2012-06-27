@@ -79,11 +79,9 @@ module Jasmine
       puts "Waiting for suite to finish in browser ..."
       while true do
         begin
-          if eval_js('return jsApiReporter.finished')
-            return
-          else
-            sleep 0.1
-          end
+          return if eval_js('return jsApiReporter.finished')
+          puts "sleeping before checking again for finished suite..."
+          sleep 1
         rescue => e
           puts "Exception thrown #{e} in SpecBuilder#wait_for_suites_to_finish_running"
           raise e
