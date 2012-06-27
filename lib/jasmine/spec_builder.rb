@@ -5,10 +5,10 @@ module Jasmine
     attr_accessor :suites
 
     def initialize(config)
-      @config = config
+      @config     = config
       @spec_files = config.spec_files
-      @runner = config
-      @spec_ids = []
+      @runner     = config
+      @spec_ids   = []
     end
 
     def start
@@ -30,7 +30,7 @@ module Jasmine
     def guess_example_locations
       @example_locations = {}
 
-      example_name_parts = []
+      example_name_parts    = []
       previous_indent_level = 0
       @config.spec_files_full_paths.each do |filename|
         line_number = 1
@@ -38,11 +38,11 @@ module Jasmine
           file.readlines.each do |line|
             match = /^(\s*)(describe|it)\s*\(\s*["'](.*)["']\s*,\s*function/.match(line)
             if (match)
-              indent_level = match[1].length / 2
-              example_name = match[3]
+              indent_level                     = match[1].length / 2
+              example_name                     = match[3]
               example_name_parts[indent_level] = example_name
 
-              full_example_name = example_name_parts.slice(0, indent_level + 1).join(" ")
+              full_example_name                     = example_name_parts.slice(0, indent_level + 1).join(" ")
               @example_locations[full_example_name] = "#{filename}:#{line_number}: in `it'"
             end
             line_number += 1
@@ -75,9 +75,20 @@ module Jasmine
     end
 
     def wait_for_suites_to_finish_running
+      started = Time.now
       puts "Waiting for suite to finish in browser ..."
-      while !eval_js('return jsApiReporter.finished') do
-        sleep 0.1
+      while true do
+        begin
+          if eval_js('return jsApiReporter.finished')
+            return
+          else
+            sleep 0.1
+          end
+        rescue => e
+          puts "Exception thrown #{e} in SpecBuilder#wait_for_suites_to_finish_running"
+          raise e
+        end
+        raise "couldn't connect to Jasmine after 60 seconds" if (started + 60 < Time.now)
       end
     end
 
@@ -105,7 +116,7 @@ module Jasmine
     end
 
     def declare_spec(parent, spec)
-      me = self
+      me           = self
       example_name = spec["name"]
       @spec_ids << spec["id"]
       backtrace = @example_locations[parent.description + " " + example_name]
@@ -122,8 +133,8 @@ module Jasmine
 
     def report_spec(spec_id)
       spec_results = results_for(spec_id)
-      out = ""
-      messages = spec_results['messages'].each do |message|
+      out          = ""
+      messages     = spec_results['messages'].each do |message|
         case
           when message["type"] == "log"
             puts message["text"]
