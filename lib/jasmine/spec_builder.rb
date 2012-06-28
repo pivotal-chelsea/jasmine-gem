@@ -79,7 +79,7 @@ module Jasmine
       puts "Waiting for suite to finish in browser ..."
       while true do
         begin
-          return if eval_js('return jsApiReporter.finished')
+          return if eval_js('(function() {return jsApiReporter.finished}());')
           puts "sleeping before checking again for finished suite..."
           sleep 1
         rescue => e
